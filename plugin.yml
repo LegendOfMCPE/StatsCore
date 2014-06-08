@@ -1,0 +1,6 @@
+name: StatsCore
+author: LegendOfMCPE
+version: 1.0
+api: [1.0.0]
+load: STARTUP
+main: legendofmcpe\statscore\Main
