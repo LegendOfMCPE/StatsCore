@@ -6,6 +6,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
+use pocketmine\Server;
 
 class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 	const NO_PERM = 0;
@@ -36,6 +37,9 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 				$this->setState(self::CONSOLE_ONLY);
 			}
 		}
+	}
+	public function reg(){
+		Server::getInstance()->getCommandMap()->register("statscore", $this);
 	}
 	public function setState($state){
 		$this->state = $state;
