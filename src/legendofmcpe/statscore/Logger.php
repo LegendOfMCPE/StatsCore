@@ -30,16 +30,37 @@ class Logger implements Listener{
 		}
 	}
 	public function updateSession(Player $player){
-		$this->getSession($player)->update();
+		return $this->getSession($player)->update();
 	}
 	public function disable(){
 	}
 	/**
-	 * @param Player $player
+	 * @param Player|string $player
 	 * @return bool|Session
 	 */
-	public function getSession(Player $player){
+	public function getSession($player){
+		if(!($player instanceof Player)){
+			$player = $this->server->getPlayer($player);
+			if(!($player instanceof Player)){
+				return false;
+			}
+		}
 		return isset($this->sessions[$this->CID($player)]) ? $this->sessions[$this->CID($player)]:false;
+	}
+	/**
+	 * @param $name
+	 * @return int
+	 */
+	public function getTotalOnlineTime($name){
+		if(($p = $this->server->getPlayer($name)) instanceof Player){
+			return $this->updateSession($p);
+		}
+		$file = Session::getPath($player);
+		if(!is_file($file)){
+			return 0;
+		}
+		$data = json_decode(file_get_contents($file));
+		return $data["online"];
 	}
 	public function CID(Player $player){
 		return $player->getAddress().":".$player->getPort();

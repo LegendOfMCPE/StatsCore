@@ -34,12 +34,12 @@ abstract class Request{
 	 * @return string
 	 */
 	public abstract function getContent();
-	public function accept(){
+	public final function accept(){
 		$this->status = self::ACCEPTED;
 		$this->onAccepted();
 	}
 	protected abstract function onAccepted();
-	public function reject(){
+	public final function reject(){
 		$this->status = self::REJECTED;
 		$this->onRejected();
 	}

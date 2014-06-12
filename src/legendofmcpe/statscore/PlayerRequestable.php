@@ -7,8 +7,16 @@ use pocketmine\Server;
 
 class PlayerRequestable implements Requestable{
 	private $name;
-	public function __construct(Player $player){
-		$this->name = $player->getName();
+	/**
+	 * @param Player|string $player
+	 */
+	public function __construct($player){
+		if($player instanceof Player){
+			$this->name = $player->getName();
+		}
+		else{
+			$this->name = $player;
+		}
 	}
 	public function isAvailable(){
 		return Server::getInstance()->getPlayer($this->name) instanceof Player;
@@ -21,5 +29,8 @@ class PlayerRequestable implements Requestable{
 	}
 	public function getRequestableIdentifier(){
 		return "PlayerRequestable ".strtolower($this->name);
+	}
+	public function getName(){
+		return $this->name;
 	}
 }

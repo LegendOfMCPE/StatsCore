@@ -12,4 +12,5 @@ interface Requestable{
 	 */
 	public function sendMessage($message);
 	public function getRequestableIdentifier();
+	public function getName();
 }
