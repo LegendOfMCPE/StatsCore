@@ -38,8 +38,14 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 			}
 		}
 	}
-	public function reg(){
-		Server::getInstance()->getCommandMap()->register("statscore", $this);
+	public function reg($prefix = false){
+		if($prefix === false){
+			$prefix = strtolower($this->getPlugin()->getName());
+		}
+		elseif(!is_string($prefix)){
+			$prefix = $this->getPlugin()->getDescription()->getPrefix();
+		}
+		Server::getInstance()->getCommandMap()->register($prefix, $this);
 	}
 	public function setState($state){
 		$this->state = $state;

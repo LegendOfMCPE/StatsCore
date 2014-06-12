@@ -20,6 +20,6 @@ class PlayerRequestable implements Requestable{
 		}
 	}
 	public function getRequestableIdentifier(){
-		return "PlayerRequestable ".$this->name;
+		return "PlayerRequestable ".strtolower($this->name);
 	}
 }
