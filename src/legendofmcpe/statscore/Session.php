@@ -21,7 +21,12 @@ class Session{
 			"online" => 0,
 			"first-join" => $micro,
 			"last-quit" => $micro,
+			"full offline days" => 0,
 		];
+		$day = 60 * 60 * 24;
+		if(($diff = $micro - $this->data["last-quit"]) >= $day/* * 1.5*/){
+			$this->data["full offline days"] += ((int) ($diff / $day));
+		}
 		$this->session = $micro;
 	}
 	public function onQuit(){
@@ -38,6 +43,13 @@ class Session{
 	public function save(){
 		file_put_contents($this->path, json_encode($this->data));
 	}
+	public function getData($key){
+		return $this->data[$key];
+	}
+	/**
+	 * @param string $name
+	 * @return string
+	 */
 	public final static function getPath($name){
 		return StatsCore::getInstance()->getPlayersFolder().strtolower(trim($name)).".json";
 	}

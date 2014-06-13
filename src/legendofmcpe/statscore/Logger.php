@@ -55,12 +55,23 @@ class Logger implements Listener{
 		if(($p = $this->server->getPlayer($name)) instanceof Player){
 			return $this->updateSession($p);
 		}
-		$file = Session::getPath($player);
+		$file = Session::getPath($name);
 		if(!is_file($file)){
 			return 0;
 		}
 		$data = json_decode(file_get_contents($file));
 		return $data["online"];
+	}
+	public function getFullOfflineDays($player){
+		if(($p = $this->server->getPlayer($player)) instanceof Player){
+			return $this->getSession($p)->getData("full offline days");
+		}
+		$file = Session::getPath($player);
+		if(!is_file($file)){
+			return 0;
+		}
+		$data = json_decode(file_get_contents($file));
+		return $data["full offline days"];
 	}
 	public function CID(Player $player){
 		return $player->getAddress().":".$player->getPort();
