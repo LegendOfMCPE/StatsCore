@@ -2,7 +2,7 @@
 
 namespace legendofmcpe\statscore;
 
-class Table{ // implements Config
+class Table implements \ArrayAccess{
 	// Note: In this class, X is counted vertically downwards and Y is counted horizontally rightwards to ease understanding in code while optimizing the visual appearance of the config file output.
 	/** @var mixed[][] access with $table[$x][$y] */
 	protected $table;
@@ -95,5 +95,17 @@ class Table{ // implements Config
 			}
 		}
 		return "$v";
+	}
+	public function offsetExists($k){
+		return isset($this->table[$k]);
+	}
+	public function offsetGet($k){
+		return $this->table[$k];
+	}
+	public function offsetSet($k, $v){
+		$this->table[$k] = (array) $v;
+	}
+	public function offsetUnset($k){
+		unset($this->table[$k]);
 	}
 }
