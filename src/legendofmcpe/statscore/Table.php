@@ -10,7 +10,7 @@ class Table implements \ArrayAccess{
 		$this->file = $file;
 	}
 	public function save(){
-		$out = "# Table generated on ".date("M j, Y")." at ".date("h:m:s")." by  LegendOfMCPE.StatsCore.Table".PHP_EOL;
+		$out = "# Table generated on ".date("M j, Y")." at ".date("h:m:s")." by legendofmcpe\\statscore\\Table".PHP_EOL;
 		foreach($this->table as $x => $row){
 			$out .= "$x | ";
 			foreach($row as $item){
@@ -36,9 +36,23 @@ class Table implements \ArrayAccess{
 			$this->table[$key] = $row;
 		}
 	}
+	public function getAll(){
+		return $this->table;
+	}
+	/**
+	 * @param string|int $x
+	 * @param int $y
+	 * @param mixed $defaultValue
+	 */
 	public function get($x, $y, $defaultValue = false){
 		return isset($this->table[$x][$y]) ? $this->table[$x][$y]:$defaultValue;
 	}
+	/**
+	 * @param string|int $x
+	 * @param int $y
+	 * @param mixed $value
+	 * @param mixed $autoFill
+	 */
 	public function set($x, $y, $value, $autoFill = null){
 		if(!isset($this->table[$x])){
 			$this->table[$x] = [];
