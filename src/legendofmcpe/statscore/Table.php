@@ -42,6 +42,7 @@ class Table implements \ArrayAccess{
 	public function set($x, $y, $value, $autoFill = null){
 		if(!isset($this->table[$x])){
 			$this->table[$x] = [];
+		}
 		for($i = 0; $i < $y; $i++){
 			if(!isset($this->table[$x][$i])){
 				$this->table[$x][$i] = $autoFill;
@@ -67,12 +68,19 @@ class Table implements \ArrayAccess{
 			$this->set($x, $y, is_array($value) ? $value[$x]:$value, $autoFill);
 		}
 	}
+	public function getKeyedColumn($keyColumn, $valueColumn){
+		$data = [];
+		for($i = 0; isset($this->table[$i][$keyColumn]) and isset($this->table[$i][$valueColumn]); $i++){
+			$data[$this->table[$i][$keyColumn]] = $this->table[$i][$valueColumn];
+		}
+		return $data;
+	}
 	protected function readValue($v){
 		if(is_numeric($v)){
 			return $v + 0; // cast to number
 		}
 		switch(strtolower($v)){
-			case "null':
+			case "null":
 				return null;
 			case "false":
 				return false;
@@ -90,7 +98,7 @@ class Table implements \ArrayAccess{
 			return "null";
 		}
 		if(is_string($v)){
-			if(is_numeric($v) or strtolower($v) === "false" or strtolower($v) === "true" or strtolower($v) === "null){
+			if(is_numeric($v) or strtolower($v) === "false" or strtolower($v) === "true" or strtolower($v) === "null"){
 				return "'$v'";
 			}
 		}
