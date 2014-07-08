@@ -17,7 +17,7 @@ class Table implements \ArrayAccess{
 				$out .= $this->writeValue($item);
 				$out .= " | "; // TODO align the columns
 			}
-			$out = substr($out, 0, -2);
+			$out = substr($out, 0, -3);
 			$out .= PHP_EOL;
 		}
 		file_put_contents($this->file, $out, LOCK_EX);
