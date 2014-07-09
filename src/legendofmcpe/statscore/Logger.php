@@ -2,6 +2,7 @@
 
 namespace legendofmcpe\statscore;
 
+use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\Player;
@@ -27,6 +28,16 @@ class Logger implements Listener{
 		if($this->getSession($p) !== false){
 			$this->sessions[$this->CID($p)]->onQuit();
 			unset($this->sessions[$this->CID($p)]);
+		}
+	}
+	/**
+	 * @param PlayerChatEvent $e
+	 * @priority MONITOR
+	 * @ignoreCancelled true
+	 */
+	public function onChat(PlayerChatEvent $e){
+		if($this->getSession($e->getPlayer()) instanceof Session){
+			$this->getSession($e->getPlayer())->onChat($e->getMessage());
 		}
 	}
 	public function updateSession(Player $player){

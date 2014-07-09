@@ -5,8 +5,6 @@ namespace legendofmcpe\statscore;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\permission\DefaultPermissions;
-use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
@@ -15,32 +13,33 @@ class StatsCore extends PluginBase implements Listener{
 	private static $name = "StatsCore";
 	/** @var Logger */
 	private $mlogger;
-	/** @var  RequestList */
+	/** @var RequestList */
 	private $reqList;
+	/** @var OfflineMessageList */
+	private $offlineInbox;
 	public function onLoad(){
 		self::$name = $this->getName();
 	}
 	public function onEnable(){
 		$this->mlogger = new Logger($this);
 		$this->reqList = new RequestList($this);
+		$this->offlineInbox = new OfflineMessageList($this);
 		@mkdir($this->getPlayersFolder());
-		$root = DefaultPermissions::registerPermission(new Permission("statscore", "Allow using all StatsCore things"));
-		$cmd = DefaultPermissions::registerPermission(new Permission("statscore.cmd", "Allow using all StatsCore commands"), $root);
-		DefaultPermissions::registerPermission(new Permission("statscore.cmd.online", "Allow using /statscore:online", Permission::DEFAULT_TRUE), $cmd);
-		$req = DefaultPermissions::registerPermission(new Permission("statscore.cmd.request", "Allow using /statscore:request", Permission::DEFAULT_TRUE), $cmd);
-		DefaultPermissions::registerPermission(new Permission("statscore.cmd.request.list", "Allow using /statscore:requests list"), $req);
-		DefaultPermissions::registerPermission(new Permission("statscore.cmd.request.accept", "Allow using /statscore:requests accept"), $req);
-		DefaultPermissions::registerPermission(new Permission("statscore.cmd.request.reject", "Allow using /statscore:requests reject"), $req);
 		$cmd = new CustomPluginCommand("online", $this, array($this, "onOnlineCmd"));
 		$cmd->setDescription("View a player's total online time.");
 		$cmd->setUsage("/online <player>");
 		$cmd->setPermission("statscore.cmd.online");
-		$cmd->reg();
+		$cmd->reg(true);
 		$cmd = new CustomPluginCommand("request", $this, array($this, "onReqCmd"));
 		$cmd->setDescription("Manage your pending requests.");
 		$cmd->setUsage("/req list|accept|reject [id]");
 		$cmd->setPermission("statscore.cmd.request");
-		$cmd->reg();
+		$cmd->reg(true);
+		$cmd = new CustomPluginCommand("inbox", $this, array($this->offlineInbox, "onCommand"));
+		$cmd->setDescription("Read your inbox");
+		$cmd->setUsage("/inbox");
+		$cmd->setPermission("statscore.cmd.inbox");
+		$cmd->reg(true);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 	public function onDisable(){

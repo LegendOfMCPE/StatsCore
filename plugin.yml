@@ -3,4 +3,29 @@ author: LegendOfMCPE
 version: 1.0
 api: [1.0.0]
 load: STARTUP
+prefix: StatsCore
+description: "A plugin that collects interesting and useful statistics of players, as well as provides a general API platform for some of LegendOfMCPE's plugins (and possibly others' plugins if they want)"
 main: legendofmcpe\statscore\Main
+permissions:
+  statscore:
+    description: Allows using all StatsCore things
+      children:
+        statscore.cmd:
+          description: Allows using all StatsCore commands
+          children:
+            statscore.cmd.online:
+              description: Allows using /online
+              default: true
+            statscore.cmd.request:
+              description: Allows using /request
+              default: true
+              children:
+                statscore.cmd.request.list:
+                  description: Allows using /requests list
+                statscore.cmd.request.accept:
+                  description: Allows using /requests accept
+                statscore.cmd.request.reject:
+                  description: Allows using /requests reject
+            statscore.cmd.inbox:
+              description: Allows reading inbox
+              default: true

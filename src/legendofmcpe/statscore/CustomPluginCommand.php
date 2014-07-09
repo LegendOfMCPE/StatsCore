@@ -43,7 +43,7 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 			$prefix = strtolower($this->getPlugin()->getName());
 		}
 		elseif(!is_string($prefix)){
-			$prefix = $this->getPlugin()->getDescription()->getPrefix();
+			$prefix = strtolower($this->getPlugin()->getDescription()->getPrefix());
 		}
 		Server::getInstance()->getCommandMap()->register($prefix, $this);
 	}
