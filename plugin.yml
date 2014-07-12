@@ -1,7 +1,7 @@
 name: StatsCore
 author: LegendOfMCPE
 version: 1.0
-api: [1.1.0]
+api: [1.0.0]
 load: STARTUP
 prefix: StatsCore
 description: "A plugin that collects interesting and useful statistics of players, as well as provides a general API platform for some of LegendOfMCPE's plugins (and possibly others' plugins if they want)"
