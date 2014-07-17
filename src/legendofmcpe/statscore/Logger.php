@@ -2,12 +2,14 @@
 
 namespace legendofmcpe\statscore;
 
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\event\Listener;
 
 class Logger implements Listener{
 	private $plugin;
@@ -19,10 +21,20 @@ class Logger implements Listener{
 		$this->server = Server::getInstance();
 		$this->server->getPluginManager()->registerEvents($this, $core);
 	}
+	/**
+	 * @param PlayerJoinEvent $e
+	 * @priority MONITOR
+	 * @ignoreCancelled true
+	 */
 	public function onJoin(PlayerJoinEvent $e){
 		$p = $e->getPlayer();
 		$this->sessions[$this->CID($p)] = new Session($p);
 	}
+	/**
+	 * @param PlayerQuitEvent $e
+	 * @priority MONITOR
+	 * @ignoreCancelled true
+	 */
 	public function onQuit(PlayerQuitEvent $e){
 		$p = $e->getPlayer();
 		if($this->getSession($p) !== false){
@@ -38,6 +50,32 @@ class Logger implements Listener{
 	public function onChat(PlayerChatEvent $e){
 		if($this->getSession($e->getPlayer()) instanceof Session){
 			$this->getSession($e->getPlayer())->onChat($e->getMessage());
+		}
+	}
+	/**
+	 * @param EntityDamageByEntityEvent $event
+	 * @priority MONITOR
+	 * @ignoreCancelled true
+	 */
+	public function onAttack(EntityDamageByEntityEvent $event){
+		$entity = $event->getEntity();
+		if(($entity instanceof Player) and (($session = $this->getSession($entity)) instanceof Session)){
+			$session->onDamage($event);
+		}
+		$attacker = $event->getDamager();
+		if(($attacker instanceof Player) and (($session = $this->getSession($attacker)) instanceof Session)){
+			$session->onAttack($event);
+		}
+	}
+	/**
+	 * @param EntityDamageEvent $event
+	 * @priority MONITOR
+	 * @ignoreCancelled true
+	 */
+	public function onEnvironmentDamage(EntityDamageEvent $event){
+		$entity = $event->getEntity();
+		if(($entity instanceof Player) and (($session = $this->getSession($entity)) instanceof Session)){
+			$session->onDamage($event);
 		}
 	}
 	public function updateSession(Player $player){

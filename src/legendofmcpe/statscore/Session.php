@@ -2,6 +2,8 @@
 
 namespace legendofmcpe\statscore;
 
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
 
 class Session{
@@ -32,12 +34,21 @@ class Session{
 				],
 			],
 			"deaths" => [
-				# $reason => $deaths, initialized by keys
-				// TODO add this
+				"explosion" => 0,
+				"drown" => 0,
+				"burn" => 0,
+				"lava" => 0,
+				"fire" => 0,
+				"shot" => 0,
+				"suffocation" => 0,
+				"command" => 0,
+				"void" => 0,
+				"misc" => 0,
+				"entity" => [],
 			],
 		];
 		$day = 60 * 60 * 24;
-		if(($diff = $micro - $this->data["last-quit"]) >= $day/* * 1.5 */){
+		if(($diff = $micro - $this->data["last-quit"]) >= $day /* * 1.5 */){ // any comments on `* 1.5`? anyone can change it into a timezone API?
 			$this->data["full offline days"] += ((int) ($diff / $day));
 		}
 		$this->session = $micro;
@@ -51,9 +62,67 @@ class Session{
 		$this->data["chat"]["count"]++;
 		$this->data["chat"]["length"] += mb_strlen($message); // multibyte characters count as one
 		if(strlen($message) !== mb_strlen($message)){ // with multibyte characters!
-			$this->data["chat"]["count"]++;
-			$this->data["chat"]["total length"] += mb_strlen($message);
-			$this->data["chat"]["characters length"] += (strlen($message) - mb_strlen($message));
+			$this->data["chat"]["multibyte"]["count"]++;
+			$this->data["chat"]["multibyte"]["total length"] += mb_strlen($message);
+			$this->data["chat"]["multibyte"]["characters length"] += (strlen($message) - mb_strlen($message));
+		}
+	}
+	public function onAttack(EntityDamageByEntityEvent $event){
+		// TODO
+	}
+	public function onDamage(EntityDamageEvent $event){
+		if($this->player->getHealth() - $event->getFinalDamage() <= 0){ // death
+			$cause = $event->getCause();
+			switch($cause){
+				case EntityDamageEvent::CAUSE_BLOCK_EXPLOSION:
+					$key = "explosion";
+					break;
+				case EntityDamageEvent::CAUSE_CUSTOM:
+					$key = "misc";
+					break;
+				case EntityDamageEvent::CAUSE_DROWNING:
+					$key = "drown";
+					break;
+				case EntityDamageEvent::CAUSE_FALL:
+					$key = "fall";
+					break;
+				case EntityDamageEvent::CAUSE_FIRE:
+					$key = "fire";
+					break;
+				case EntityDamageEvent::CAUSE_FIRE_TICK:
+					$key = "burn";
+					break;
+				case EntityDamageEvent::CAUSE_LAVA:
+					$key = "lava";
+					break;
+				case EntityDamageEvent::CAUSE_MAGIC:
+					$key = "misc";
+					break;
+				case EntityDamageEvent::CAUSE_PROJECTILE:
+					$key = "shot";
+					break;
+				case EntityDamageEvent::CAUSE_SUFFOCATION:
+					$key = "suffocation";
+					break;
+				case EntityDamageEvent::CAUSE_SUICIDE:
+					$key = "command";
+					break;
+				case EntityDamageEvent::CAUSE_VOID:
+					$key = "void";
+					break;
+			}
+			if(isset($key)){
+				$this->data["deaths"][$key]++;
+			}
+			elseif($event instanceof EntityDamageByEntityEvent){
+				$cause = $event->getDamager();
+				$class = strtolower(get_class($cause));
+				$class = array_slice(explode("\\", $class), -1)[0];
+				if(!isset($this->data["deaths"]["entity"][$class])){
+					$this->data["deaths"]["entity"][$class] = 0;
+				}
+				$this->data["deaths"]["entity"][$class] ++;
+			}
 		}
 	}
 	public function update(){
