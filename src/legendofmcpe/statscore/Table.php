@@ -37,10 +37,13 @@ class Table{
 			if(substr($line, 0, 1) === "#"){
 				continue;
 			}
+			if(strpos($line, "|") === false){
+				continue;
+			}
 			$items = explode("|", $line);
 			$items = array_map("trim", $items);
 			$items = array_map(array($this, "readItem"), $items);
-			$x = count($this->table);
+			$x = array_shift($args);
 			$this->table[$x] = $items;
 		}
 		fclose($res);
@@ -52,10 +55,10 @@ class Table{
 		$this->updateMaxLengths();
 		foreach($this->table as $row){
 			$boxes = [];
-			foreach($row as $x => $item){
+			foreach($row as $y => $item){
 				$text = $this->writeItem($item);
 				$len = mb_strlen($text);
-				$diff = $this->maxLens[$x] - $len;
+				$diff = $this->maxLens[$y] - $len;
 				switch($this->align){
 					case self::ALIGN_CENTER:
 						$out = str_repeat(" ", (int) floor($diff / 2));
@@ -95,14 +98,14 @@ class Table{
 		return var_export($item, true);
 	}
 	protected function updateMaxLengths(){
-		foreach($this->table as $y => $row){
-			foreach($row as $x => $item){
+		foreach($this->table as $row){
+			foreach($row as $y => $item){
 				$text = $this->writeItem($item);
-				if(isset($this->maxLens[$x])){
-					$this->maxLens[$x] = max($this->maxLens[$x], mb_strlen($text));
+				if(isset($this->maxLens[$y])){
+					$this->maxLens[$y] = max($this->maxLens[$y], mb_strlen($text));
 				}
 				else{
-					$this->maxLens[$x] = mb_strlen($text);
+					$this->maxLens[$y] = mb_strlen($text);
 				}
 			}
 		}
