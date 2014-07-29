@@ -46,6 +46,7 @@ class Session{
 				"misc" => 0,
 				"entity" => [],
 			],
+			"kills" => [],
 		];
 		$day = 60 * 60 * 24;
 		if(($diff = $micro - $this->data["last-quit"]) >= $day /* * 1.5 */){ // any comments on `* 1.5`? anyone can change it into a timezone API?
@@ -68,7 +69,15 @@ class Session{
 		}
 	}
 	public function onAttack(EntityDamageByEntityEvent $event){
-		// TODO
+		$victim = $event->getEntity();
+		if($victim->getHealth() - $event->getFinalDamage() <= 0){ // kill
+			$type = strtolower($victim);
+			$type = array_slice(explode("\\", $type), -1)[0];
+			if(!isset($this->data["kills"][$type])){
+				$this->data["kills"][$type] = 0;
+			}
+			$this->data["kills"][$type]++;
+		}
 	}
 	public function onDamage(EntityDamageEvent $event){
 		if($this->player->getHealth() - $event->getFinalDamage() <= 0){ // death

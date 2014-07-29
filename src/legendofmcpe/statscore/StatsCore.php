@@ -8,6 +8,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\Utils;
 
 class StatsCore extends PluginBase implements Listener{
 	private static $name = "StatsCore";
@@ -17,10 +18,16 @@ class StatsCore extends PluginBase implements Listener{
 	private $reqList;
 	/** @var OfflineMessageList */
 	private $offlineInbox;
+	/** @var \SQLite3 */
+	private $time_db;
 	public function onLoad(){
 		self::$name = $this->getName();
 	}
 	public function onEnable(){
+		$this->saveDefaultConfig();
+		$this->time_db = new \SQLite3($this->getDataFolder()."ip_timezones_cache.sq3");
+		$this->time_db->exec("CREATE TABLE IF NOT EXISTS ips (ip TEXT PRIMARY KEY, coords TEXT);");
+		$this->time_db->exec("CREATE TABLE IF NOT EXISTS times (coords TEXT PRIMARY KEY, secs_delta INT);");
 		$this->mlogger = new Logger($this);
 		$this->reqList = new RequestList($this);
 		$this->offlineInbox = new OfflineMessageList($this);
@@ -118,10 +125,78 @@ class StatsCore extends PluginBase implements Listener{
 		$p = $event->getPlayer();
 		$this->getRequestList()->onRequestable(new PlayerRequestable($p));
 	}
+	public function getCoordsFromIP($ip, callable $callback){
+		$result = $this->time_db->query("SELECT coords FROM ips WHERE ip = '$ip';")->fetchArray(SQLITE3_ASSOC);
+		if(is_array($result) and isset($result["coords"])){
+			call_user_func($callback, $result["coords"]);
+			return;
+		}
+		if(strpos($ip, "192.168.") === 0 or $ip === "0.0.0.0" or $ip === "127.0.0.1"){
+			$ip = Utils::getIP();
+		}
+		$this->getServer()->getScheduler()->scheduleAsyncTask(new UrlGetTask("http://ipinfo.io/$ip/json",
+			function($result) use($callback){
+				$data = @json_decode($result);
+				if(is_array($data) and isset($data["loc"])){
+					call_user_func($callback, $data["loc"]);
+				}
+				else{
+					call_user_func($callback, false);
+				}
+			}, 5));
+	}
+	public function getTimezoneDeltaFromCoords($coords, callable $callback){
+		$result = $this->time_db->query("SELECT secs_delta FROM times WHERE coords = '$coords';")->fetchArray(SQLITE3_ASSOC);
+		if(is_array($result) and isset($result["secs_delta"])){
+			call_user_func($callback, $result["secs_delta"]);
+			return;
+		}
+		$time = time();
+		$key = $this->getConfig()->get("google timezone api")["api key"];
+		if($key === false){
+			call_user_func($callback, "NO_GOOGLE_API_KEY"); // maps for business not supported yet
+			return;
+		}
+		$this->getServer()->getScheduler()->scheduleAsyncTask(new UrlGetTask(
+			"https://maps.googleapis.com/maps/api/timezone/json?location=$coords&timestamp=$time&key=$key",
+			function($json) use($callback){
+				if($json === false){
+					call_user_func($callback, "OFFLINE");
+					return;
+				}
+				$data = json_decode($json);
+				if(strtoupper($data["status"]) === "OK"){
+					call_user_func($callback, $data["rawOffset"]); // don't count daylight saving time
+				}
+				else{
+					call_user_func($callback, $data["status"]);
+				}
+			}
+		));
+	}
+	public function getTimezoneDeltaFromIP($ip, callable $callback){
+		$instance = $this;
+		$this->getCoordsFromIP($ip, function($coords) use($callback, $instance){
+			if($coords === false){
+				call_user_func($callback, 0);
+				return;
+			}
+			$instance->getTimezoneDeltaFromCoords($coords, function($result) use($callback, $instance){
+				if(!is_int($result)){
+					$instance->getLogger()->alert("The following error occurred when querying from Google Timezone API: $result. Players will be assumed at timezone GMT.");
+					call_user_func($callback, 0);
+					return;
+				}
+				call_user_func($callback, $result);
+			});
+		});
+	}
 	/**
 	 * @return static|null
 	 */
 	public static function getInstance(){
 		return Server::getInstance()->getPluginManager()->getPlugin(self::$name);
 	}
+	// thread-blocking static API
+	// do <b>not</b> call these functions from the main thread
 }
