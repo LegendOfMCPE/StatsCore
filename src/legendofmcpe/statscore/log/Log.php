@@ -220,6 +220,7 @@ abstract class Log implements Listener{
 	/////////////////////////////////
 	// abstract API getter section //
 	/////////////////////////////////
+	public abstract function getOfflineDays($name);
 	public abstract function getTotalOnline($name);
 	public abstract function getLastOnline($name);
 	public abstract function getLastJoin($name);
