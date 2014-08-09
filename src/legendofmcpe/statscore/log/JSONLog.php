@@ -14,7 +14,7 @@ class JSONLog extends Log{
 	protected function endSession(Player $player){
 		// TODO: Implement endSession() method.
 	}
-	protected function addOfflineDays($days){
+	protected function addOfflineDays(Player $player, $days){
 		// TODO: Implement addOfflineDays() method.
 	}
 	protected function setLastJoin(Player $player){
@@ -23,7 +23,7 @@ class JSONLog extends Log{
 	protected function setLastOnline(Player $player){
 		// TODO: Implement setLastOnline() method.
 	}
-	protected function addTotalOnline(Player $player){
+	protected function addTotalOnline(Player $player, $time){
 		// TODO: Implement addTotalOnline() method.
 	}
 	protected function incChatMsgCnt(Player $player){
@@ -50,7 +50,7 @@ class JSONLog extends Log{
 	protected function addKill(Player $player, $victim){
 		// TODO: Implement addKill() method.
 	}
-	protected function setLastIP($player){
+	protected function setLastIP(Player $player){
 		// TODO: Implement setLastIP() method.
 	}
 	protected function setLocalCoords($coords){
@@ -85,5 +85,26 @@ class JSONLog extends Log{
 	}
 	public function getCurrentTimezoneDeltaFromUTC(){
 		// TODO: Implement getCurrentTimezoneDeltaFromUTC() method.
+	}
+	public function getDeaths($name){
+		// TODO: Implement getDeaths() method.
+	}
+	public function getKills($name){
+		// TODO: Implement getKills() method.
+	}
+	public function getChatMsgTotalLen($name){
+		// TODO: Implement getChatMsgTotalLen() method.
+	}
+	public function getChatMsgCnt($name){
+		// TODO: Implement getChatMsgCnt() method.
+	}
+	public function getMbChatTotalLen($name){
+		// TODO: Implement getMbChatTotalLen() method.
+	}
+	public function getMbChatCnt($name){
+		// TODO: Implement getMbChatCnt() method.
+	}
+	public function getChatFreq($name){
+		// TODO: Implement getChatFreq() method.
 	}
 }

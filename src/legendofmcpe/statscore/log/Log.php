@@ -86,6 +86,7 @@ abstract class Log implements Listener{
 	public function onLogin(PlayerLoginEvent $event){
 		$p = $event->getPlayer();
 		$this->startSession($p);
+		$this->setLastIP($p);
 	}
 	/**
 	 * @param PlayerJoinEvent $event
@@ -101,7 +102,7 @@ abstract class Log implements Listener{
 		$now = floor($now / 60 / 60 / 24);
 		$diff = (int) ($now - $lastJoin);
 		if($diff >= 1){
-			$this->addOfflineDays($diff);
+			$this->addOfflineDays($p, $diff);
 		}
 		$this->setLastJoin($p);
 	}
@@ -129,8 +130,10 @@ abstract class Log implements Listener{
 		$micro = microtime(true);
 		$id = $player->getID();
 		if(isset($this->lastChat[$id])){
-			$this->incChatMsgFreqRecCnt($player);
-			$this->addChatMsgFreq($player, $micro - $this->lastChat[$id]);
+			if($micro - $this->lastChat < 9999){ // chat-freq-timeout
+				$this->incChatMsgFreqRecCnt($player);
+				$this->addChatMsgFreq($player, $micro - $this->lastChat[$id]);
+			}
 		}
 		$this->lastChat[$id] = $micro;
 	}
@@ -174,7 +177,7 @@ abstract class Log implements Listener{
 	public function onQuit(PlayerQuitEvent $event){
 		$p = $event->getPlayer();
 		$this->setLastOnline($p);
-		$this->addTotalOnline($p, microtime(true) - $this->getLastJoin($p->getName()));
+		$this->addTotalOnline($p, time() - $this->getLastJoin($p->getName()));
 		$this->endSession($p);
 	}
 	/////////////////////////////
@@ -185,10 +188,10 @@ abstract class Log implements Listener{
 	protected abstract function startSession(Player $player);
 	protected abstract function endSession(Player $player);
 	// online/offline
-	protected abstract function addOfflineDays($days);
+	protected abstract function addOfflineDays(Player $player, $days);
 	protected abstract function setLastJoin(Player $player);
 	protected abstract function setLastOnline(Player $player);
-	protected abstract function addTotalOnline(Player $player);
+	protected abstract function addTotalOnline(Player $player, $sessionTime);
 	// chat
 	protected abstract function incChatMsgCnt(Player $player);
 	protected abstract function addChatMsgLen(Player $player, $len);
@@ -200,7 +203,7 @@ abstract class Log implements Listener{
 	protected abstract function addDeath(Player $player, $reason);
 	protected abstract function addKill(Player $player, $victim);
 	// coords & timezones
-	protected abstract function setLastIP($player);
+	protected abstract function setLastIP(Player $player);
 	protected abstract function setLocalCoords($coords);
 	protected abstract function setCoords($ip, $coords);
 	protected abstract function setTimezoneDeltaFromUTC($coords, $delta);
@@ -221,6 +224,19 @@ abstract class Log implements Listener{
 	public abstract function getLastOnline($name);
 	public abstract function getLastJoin($name);
 	public abstract function getLastIP($name);
+	public abstract function getDeaths($name);
+	public abstract function getKills($name);
+	public function getChatMsgAvgLen($name){
+		return $this->getChatMsgTotalLen($name) - $this->getChatMsgCnt($name);
+	}
+	public abstract function getChatMsgTotalLen($name);
+	public abstract function getChatMsgCnt($name);
+	public function getMbChatAvgLen($name){
+		return $this->getMbChatTotalLen($name) - $this->getMbChatCnt($name);
+	}
+	public abstract function getMbChatTotalLen($name);
+	public abstract function getMbChatCnt($name);
+	public abstract function getChatFreq($name);
 	public abstract function getCoords($ip);
 	public abstract function getTimezoneDelta($coords);
 	public abstract function getCurrentTimezoneDeltaFromUTC();
@@ -234,6 +250,19 @@ abstract class Log implements Listener{
 		}
 		$coords = $this->getCoords($ip);
 		$delta = $this->getTimezoneDelta($coords);
-		return microtime(true) + $delta;
+		return time() + $delta;
+	}
+	protected function formatIP($ip){
+		return implode("", array_map(function($str){
+			return chr(intval($str));
+		}, explode(".", $ip)));
+	}
+	protected function unformatIP($bin){
+		$values = str_split($bin);
+		$numbers = [];
+		foreach($values as $value){
+			$numbers[] = "$value";
+		}
+		return implode(".", $numbers);
 	}
 }
