@@ -128,4 +128,10 @@ class StatsCore extends PluginBase implements Listener{
 	public static function getInstance(){
 		return Server::getInstance()->getPluginManager()->getPlugin(self::$name);
 	}
+	/**
+	 * @return \legendofmcpe\statscore\log\Log
+	 */
+	public function getLog(){
+		return $this->log;
+	}
 }
