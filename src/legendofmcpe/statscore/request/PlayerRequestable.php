@@ -1,6 +1,6 @@
 <?php
 
-namespace legendofmcpe\statscore;
+namespace legendofmcpe\statscore\request;
 
 use pocketmine\Player;
 use pocketmine\Server;
@@ -31,6 +31,18 @@ class PlayerRequestable implements Requestable{
 		return "PlayerRequestable ".strtolower($this->name);
 	}
 	public function getName(){
+		return $this->name;
+	}
+	public function getGetter(){
+		return str_replace(["<name>"], [var_export($this->name, true)], <<<'EOC'
+$requestable = $this->main->getServer()->getPlayerExact(<name>);
+if(!($requestable instanceof \pocketmine\Player)){
+	$requestable = null;
+}
+EOC
+		);
+	}
+	public function getMetadata(){
 		return $this->name;
 	}
 }

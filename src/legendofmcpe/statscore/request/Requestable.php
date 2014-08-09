@@ -1,6 +1,6 @@
 <?php
 
-namespace legendofmcpe\statscore;
+namespace legendofmcpe\statscore\request;
 
 interface Requestable{
 	/**

@@ -1,8 +1,8 @@
 <?php
 
-namespace legendofmcpe\statscore;
+namespace legendofmcpe\statscore\request;
 
-abstract class Request{
+abstract class Request implements IRequest{
 	/**
 	 * Waiting for the requestable to decide what to do with this request
 	 */
@@ -23,12 +23,17 @@ abstract class Request{
 	 * @var Requestable
 	 */
 	protected $to;
+	/** @var int */
+	protected $id;
 	/**
 	 * @var int A value between Request::PENDING, Request::ACCEPTED and Request::REJECTED
 	 */
 	private $status = self::PENDING;
 	public function __construct(Requestable $to){
 		$this->to = $to;
+	}
+	public function validate($id){
+		$this->id = $id;
 	}
 	/**
 	 * @return string
@@ -44,6 +49,16 @@ abstract class Request{
 		$this->onRejected();
 	}
 	protected abstract function onRejected();
+	public final function remove(){
+		$this->status = self::REMOVED;
+	}
+	/**
+	 * @return int
+	 */
+	public function getID(){
+		return $this->id;
+	}
+	protected abstract function onRemoved();
 	/**
 	 * @return Requestable
 	 */
@@ -51,33 +66,23 @@ abstract class Request{
 		return $this->to;
 	}
 	/**
-	 * @return string[]
-	 */
-	public function getRequestIDs(){
-		$results = $this->getInternalRequestIDs();
-		$output = [];
-		foreach($results as $str){
-			if(!is_string($str) or is_numeric($str) and strpos($str, ".") === false){
-				trigger_error("Illegal return type from ".get_class($this)."::getInternalRequestIDs(): $str", E_USER_WARNING);
-				continue;
-			}
-			$output[] = $str;
-		}
-		return $output;
-	}
-	/**
 	 * @return int
 	 */
 	public function getStatus(){
 		return $this->status;
 	}
-	public function setRemoved(){
-		$this->status = self::REMOVED;
-	}
 	/**
-	 * @return string[] this method MUST be non-numeric
+	 * @return string
 	 */
-	protected function getInternalRequestIDs(){
-		return [];
+	public function getStrStatus(){
+		switch($this->status){
+			case self::PENDING:
+				return "pending";
+			case self::ACCEPTED:
+				return "accepted";
+			case self::REJECTED:
+				return "rejected";
+		}
+		return "removed";
 	}
 }
