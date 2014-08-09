@@ -1,6 +1,6 @@
 <?php
 
-namespace legendofmcpe\statscore;
+namespace legendofmcpe\statscore\utils;
 
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;

@@ -3,7 +3,7 @@ google timezone api:
   # Your Google Developer API key
   # Get it from the following instructions:
   #The Time Zone API uses an API key to identify your application. API keys are managed through the Google APIs console. To create your key:
-  #Visit the APIs console at https://code.google.com/apis/console and log in with your Google Account.
+  #Visit the APIs console at https://code.google.com/apis/console and logger in with your Google Account.
   #Click the Services link from the left-hand menu in the APIs Console, then activate the Time Zone API service.
   #Once the service has been activated, your API key is available from the API Access page, in the Simple API Access section. Time Zone API applications use the Key for server apps.
   # If no API key is entered, the timezone of players will always be at your time zone.

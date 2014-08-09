@@ -17,12 +17,16 @@ class StatsCore extends PluginBase implements Listener{
 	private $reqList;
 	/** @var OfflineMessageList */
 	private $offlineInbox;
+	/** @var log\Log */
+	private $log;
 	public function onLoad(){
 		self::$name = $this->getName();
 	}
 	public function onEnable(){
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->getServer()->getPluginManager()->registerEvents($this->offlineInbox = new OfflineMessageList($this), $this);
+		$this->log = null; // TODO which type
+		$this->getServer()->getPluginManager()->registerEvents($this->log, $this);
 		$this->reqList = new RequestList($this);
 		$cmd = new CustomPluginCommand("request", $this, array($this, "onReqCmd"));
 		$cmd->setDescription("Manage requests");

@@ -1,6 +1,6 @@
 <?php
 
-namespace legendofmcpe\statscore;
+namespace legendofmcpe\statscore\utils;
 
 class Table{
 	const ALIGN_LEFT = 0;
