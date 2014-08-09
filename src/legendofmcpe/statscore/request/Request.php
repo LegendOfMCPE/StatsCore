@@ -2,7 +2,7 @@
 
 namespace legendofmcpe\statscore\request;
 
-abstract class Request implements IRequest{
+abstract class Request{
 	/**
 	 * Waiting for the requestable to decide what to do with this request
 	 */
