@@ -12,9 +12,10 @@ class MysqliLog extends Log{
 	protected function init(array $args){
 		$this->table = $args["table"];
 		$this->db = $args[0];
+		$defaultIP = $this->esc("\x00\x00\x00\x00");
 		$this->db->query("CREATE TABLE IF NOT EXISTS players (
 				name VARCHAR(31) PRIMARY KEY,
-				last_ip VARBINARY(4) DEFAULT '{$this->db->escape_string("\x00\x00\x00\x00")}',
+				last_ip VARBINARY(4) DEFAULT $defaultIP,
 				last_join INT UNSIGNED, # 4 bytes are very enough. I don't think this plugin can last until year 2106, which is when 0xFFFFFFFF is reached.
 				last_online INT UNSIGNED,
 				total_online INT UNSIGNED DEFAULT 0,
@@ -30,7 +31,8 @@ class MysqliLog extends Log{
 		$this->db->query("CREATE TABLE IF NOT EXISTS timezones (coords VARCHAR(15) PRIMARY KEY, delta MEDIUMINT);");
 		$this->db->query("CREATE TABLE IF NOT EXISTS deaths (player VARCHAR(31), reason TEXT(255), times MEDIUMINT);");
 		$this->db->query("CREATE TABLE IF NOT EXISTS kills (player VARCHAR(31), victim TEXT(63), times MEDIUMINT);");
-		$result = $this->db->query("SELECT coords FROM coords WHERE ip = '".$this->db->escape_string($this->formatIP("0.0.0.0"))."';");
+		$result = $this->db->query("SELECT coords FROM coords WHERE
+				ip = $defaultIP;");
 		$ret = $result->fetch_assoc();
 		$result->close();
 		if(!is_array($ret)){
@@ -39,14 +41,14 @@ class MysqliLog extends Log{
 	}
 	protected function startSession(Player $player){
 		$now = time();
-		$result = $this->db->query("SELECT last_ip FROM players WHERE name = '{$this->db->escape_string($player->getName())}';");
+		$result = $this->db->query("SELECT last_ip FROM players WHERE name = {$this->esc($player->getName())};");
 		$array = $result->fetch_assoc();
 		$result->close();
 		if(!is_array($array)){
 			$this->db->query("INSERT INTO players (name, last_join, last_online) VALUES (
-				'{$this->db->escape_string($player->getName())}', $now, $now);");
-			$result = $this->db->query("SELECT coords FROM coords WHERE ip = '".
-					$this->db->escape_string($this->formatIP($player->getAddress()))."';");
+				{$this->esc($player->getName())}, $now, $now);");
+			$result = $this->db->query("SELECT coords FROM coords
+					WHERE ip = {$this->esc($this->formatIP($player->getAddress()))};");
 			$array = $result->fetch_assoc();
 			$result->close();
 			if(!is_array($array)){
@@ -89,29 +91,31 @@ class MysqliLog extends Log{
 		$this->updateColumn($player, "chat_msg_mb_len", "chat_msg_mb_len + $delta");
 	}
 	protected function addDeath(Player $player, $reason){
-		$name = $this->db->escape_string($player->getName());
-		$cause = $this->db->escape_string($reason);
-		$result = $this->db->query("SELECT times FROM deaths WHERE name = '$name' AND reason = '$cause';");
+		$name = $this->esc($player->getName());
+		$cause = $this->esc($reason);
+		$result = $this->db->query("SELECT times FROM deaths WHERE
+				name = $name AND reason = $cause;");
 		$data = $result->fetch_assoc();
 		$result->close();
 		if(is_array($data)){
-			$this->db->query("UPDATE deaths SET times = times + 1 WHERE name = '$name' AND reason = '$cause';");
+			$this->db->query("UPDATE deaths SET times = times + 1 WHERE name = $name AND reason = $cause;");
 		}
 		else{
-			$this->db->query("INSERT INTO deaths VALUES ('$name', '$cause', 1);");
+			$this->db->query("INSERT INTO deaths VALUES ($name, $cause, 1);");
 		}
 	}
 	protected function addKill(Player $player, $victim){
-		$name = $this->db->escape_string($player->getName());
-		$victim = $this->db->escape_string($victim);
-		$result = $this->db->query("SELECT times FROM kills WHERE name = '$name' AND victim = '$victim';");
+		$name = $this->esc($player->getName());
+		$victim = $this->esc($victim);
+		$result = $this->db->query("SELECT times FROM kills WHERE
+				name = $victim AND victim = $name;");
 		$data = $result->fetch_assoc();
 		$result->close();
 		if(is_array($data)){
-			$this->db->query("UPDATE kills SET times = times + 1 WHERE name = '$name' AND victim = '$victim';");
+			$this->db->query("UPDATE kills SET times = times + 1 WHERE name = $name AND victim = $victim;");
 		}
 		else{
-			$this->db->query("INSERT INTO kills VALUES ('$name', '$victim', 1);");
+			$this->db->query("INSERT INTO kills VALUES ($name, $victim, 1);");
 		}
 	}
 	protected function setLastIP(Player $player){
@@ -121,28 +125,44 @@ class MysqliLog extends Log{
 		$this->setCoords("0.0.0.0", $coords);
 	}
 	protected function setCoords($ip, $coords){
-		$ip = $this->db->escape_string($this->formatIP($ip));
-		$coords = $this->db->escape_string($coords);
-		$this->db->query("REPLACE INTO coords VALUES ('$ip', '$coords');");
+		$this->db->query("REPLACE INTO coords VALUES
+				({$this->esc($this->formatIP($ip))}, {$this->esc($coords)};");
 	}
 	protected function setTimezoneDeltaFromUTC($coords, $delta){
-		$coords = $this->db->escape_string($coords);
-		$this->db->query("REPLACE INTO timezones VALUES ('$coords', $delta);");
+		$this->db->query("REPLACE INTO timezones VALUES ({$this->esc($coords)}, $delta);");
 	}
 	protected function setCurrentTimezoneDeltaFromUTC($delta){
 		$this->setTimezoneDeltaFromUTC($this->getCoords("0.0.0.0"), $delta);
 	}
 	public function getTotalOnline($name){
-		// TODO: Implement getTotalOnline() method.
+		$result = $this->db->query("SELECT total_online FROM players WHERE name = {$this->esc($name)};");
+		$array = $result->fetch_assoc();
+		$result->close();
+		if(is_array($array)){
+			return $array["total_online"];
+		}
+		return 0;
 	}
 	public function getLastOnline($name){
-		// TODO: Implement getLastOnline() method.
+		$result = $this->db->query("SELECT last_online FROM players WHERE name = {$this->esc($name)};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["last_online"];
+		}
+		return time();
 	}
 	public function getLastJoin($name){
-		// TODO: Implement getLastJoin() method.
+		$result = $this->db->query("SELECT last_join FROM players WHERE name = {$this->esc($name)};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["last_join"];
+		}
+		return time();
 	}
 	public function getLastIP($name){
-		// TODO: Implement getLastIP() method.
+		$result = $this->db->query("SELECT last_ip FROM players WHERE name = {$this->esc($name)};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["last_ip"];
+		}
+		return false;
 	}
 	public function getCoords($ip){
 		if($ip === "127.0.0.1" or strpos($ip, "10.") === 0 or strpos($ip, "192.168.") === 0){
@@ -154,7 +174,7 @@ class MysqliLog extends Log{
 				$ip = "0.0.0.0";
 			}
 		}
-		$result = $this->db->query("SELECT coords FROM coords WHERE ip = '{$this->db->escape_string($ip)}';");
+		$result = $this->db->query("SELECT coords FROM coords WHERE ip = {$this->esc($ip)};");
 		$array = $result->fetch_assoc();
 		$result->close();
 		if(is_array($array)){
@@ -164,7 +184,7 @@ class MysqliLog extends Log{
 		return null;
 	}
 	public function getTimezoneDelta($coords){
-		$result = $this->db->query("SELECT delta FROM timezones WHERE coords = '{$this->db->escape_string($coords)}';");
+		$result = $this->db->query("SELECT delta FROM timezones WHERE coords = {$this->esc($coords)};");
 		$array = $result->fetch_assoc();
 		$result->close();
 		if(is_array($array)){
@@ -176,7 +196,7 @@ class MysqliLog extends Log{
 		return $this->getTimezoneDelta($this->getCoords("0.0.0.0"));
 	}
 	private function updateColumn(Player $player, $column, $value){
-		$this->db->query("UPDATE players SET $column = $value WHERE name = '{$this->db->escape_string($player->getName())}';");
+		$this->db->query("UPDATE players SET $column = $value WHERE name = {$this->esc($player->getName())};");
 	}
 	public function getDeaths($name){
 		// TODO: Implement getDeaths() method.
@@ -201,5 +221,8 @@ class MysqliLog extends Log{
 	}
 	public function getOfflineDays($name){
 		// TODO: Implement getOfflineDays() method.
+	}
+	private function esc($str){
+		return $str === null ? "NULL":"'{$this->db->escape_string($str)}'";
 	}
 }
