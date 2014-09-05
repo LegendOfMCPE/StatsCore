@@ -199,28 +199,57 @@ class MysqliLog extends Log{
 		$this->db->query("UPDATE players SET $column = $value WHERE name = {$this->esc($player->getName())};");
 	}
 	public function getDeaths($name){
-		// TODO: Implement getDeaths() method.
+		$result = $this->db->query("SELECT deaths FROM times WHERE player = {$this->esc($player->getName())};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["deaths"];
+		}
+		return false;
 	}
 	public function getKills($name){
-		// TODO: Implement getKills() method.
+		$result = $this->db->query("SELECT kills FROM times WHERE player = {$this->esc($player->getName())};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["kills"];
+		}
+		return false;
 	}
 	public function getChatMsgTotalLen($name){
-		// TODO: Implement getChatMsgTotalLen() method.
+		$result = $this->db->query("SELECT players FROM chat_msg_total_len;");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["players"];
+		}
+		return false;
 	}
 	public function getChatMsgCnt($name){
-		// TODO: Implement getChatMsgCnt() method.
+		$result = $this->db->query("SELECT players FROM chat_msg_cnt;");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["players"];
+		}
+		return false;
 	}
 	public function getMbChatTotalLen($name){
-		// TODO: Implement getMbChatTotalLen() method.
+		$result = $this->db->query("SELECT players FROM chat_msg_mb_len;");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["players"];
+		}
+		return false;
 	}
 	public function getMbChatCnt($name){
-		// TODO: Implement getMbChatCnt() method.
+		$result = $this->db->query("SELECT players FROM chat_msg_mb_cnt;");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["players"];
+		}
+		return false;
 	}
 	public function getChatFreq($name){
 		// TODO: Implement getChatFreq() method.
+		// Is this Chat Frequency Count or Average?
 	}
 	public function getOfflineDays($name){
-		// TODO: Implement getOfflineDays() method.
+		$result = $this->db->query("SELECT players FROM offline_days WHERE player = {$this->esc($player->getName())};");
+		if(is_array($array = $result->fetch_assoc())){
+			return $array["players"];
+		}
+		return false;
 	}
 	private function esc($str){
 		return $str === null ? "NULL":"'{$this->db->escape_string($str)}'";
