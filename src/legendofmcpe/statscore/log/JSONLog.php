@@ -18,6 +18,6 @@ class JSONLog extends NestedArrayLog{
 		file_put_contents($file, json_encode($array, JSON_BIGINT_AS_STRING | JSON_PRETTY_PRINT));
 	}
 	protected function getPlayerFile($name){
-		return realpath($this->dir.DIRECTORY_SEPARATOR.$name.".json");
+		return realpath($this->dir.DIRECTORY_SEPARATOR.strtolower($name).".json");
 	}
 }

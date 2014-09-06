@@ -18,6 +18,6 @@ class YAMLLog extends NestedArrayLog{
 		file_put_contents($file, yaml_emit($array, YAML_UTF8_ENCODING));
 	}
 	protected function getPlayerFile($name){
-		return realpath($this->dir.DIRECTORY_SEPARATOR.$name.".json");
+		return realpath($this->dir.DIRECTORY_SEPARATOR.strtolower($name).".yml");
 	}
 }
