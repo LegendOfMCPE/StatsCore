@@ -5,6 +5,10 @@ namespace legendofmcpe\statscore\log;
 use pocketmine\Player;
 
 abstract class NestedArrayLog extends Log{
+	protected $dir;
+	public function __construct($dir){
+		$this->dir = $dir;
+	}
 	protected function init(array $args){
 		// TODO: Implement init() method.
 	}
@@ -120,4 +124,9 @@ abstract class NestedArrayLog extends Log{
 	 * @param array $array
 	 */
 	protected abstract function writeToFile($file, array $array);
+	/**
+	 * @param string $name
+	 * @return string absolute path name
+	 */
+	protected abstract function getPlayerFile($name);
 }

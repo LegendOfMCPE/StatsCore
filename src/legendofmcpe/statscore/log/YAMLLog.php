@@ -17,4 +17,7 @@ class YAMLLog extends NestedArrayLog{
 	protected function writeToFile($file, array $array){
 		file_put_contents($file, yaml_emit($array, YAML_UTF8_ENCODING));
 	}
+	protected function getPlayerFile($name){
+		return realpath($this->dir.DIRECTORY_SEPARATOR.$name.".json");
+	}
 }
