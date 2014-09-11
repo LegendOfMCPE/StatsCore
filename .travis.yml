@@ -8,8 +8,14 @@ php:
 
 before_script:
   - mkdir plugin-test
-  - wget -O plugin-test/PocketMine.phar https://github.com/PocketMine/PocketMine-MP/releases/download/Alpha_1.4dev-491/PocketMine-MP_Alpha_1.4dev-491.phar
+  - cd plugin-test
+  - wget -O PocketMine.phar https://github.com/PocketMine/PocketMine-MP/releases/download/Alpha_1.4dev-491/PocketMine-MP_Alpha_1.4dev-491.phar
   - pecl install channel://pecl.php.net/pthreads-2.0.7
   - pecl install channel://pecl.php.net/weakref-0.2.4
   - echo | pecl install channel://pecl.php.net/yaml-1.1.1
-  - mkdir plugin-test/plugins
+  - mkdir plugins
+  - wget -O ConsoleScript.php https://github.com/PocketMine/DevTools/blob/master/src/DevTools/ConsoleScript.php
+  - php ConsoleScript.php -dphar.readonly=0 --make ../$TRAVIS_BUILD_DIR --out plugins/StatsCore.phar
+
+script:
+  - php PocketMine.phar
