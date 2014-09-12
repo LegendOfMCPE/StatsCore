@@ -24,4 +24,4 @@ script:
   - php PocketMine/src/PocketMine.php
 
 after_script:
-  - dir /s/p/w
+  - dir --recursive
