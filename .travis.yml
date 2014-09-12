@@ -21,7 +21,8 @@ before_script:
   - wget -O PocketMine/pocketmine.yml https://raw.githubusercontent.com/PocketMine/PocketMine-MP/master/src/pocketmine/resources/pocketmine.yml
 
 script:
-  - php PocketMine/src/pocketmine/PocketMine.php
+  - cd PocketMine
+  - php src/pocketmine/PocketMine.php
 
 after_script:
-  - dir --recursive
+  - dir .. --recursive
