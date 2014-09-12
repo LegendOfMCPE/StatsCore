@@ -12,16 +12,16 @@ before_install:
   - echo | pecl install channel://pecl.php.net/yaml-1.1.1
 
 before_script:
-  - git clone --recursive https://github.com/PocketMine/PocketMine-MP.git plugin-test
-  - cd plugin-test
-  - mkdir plugins
+  - git clone --recursive https://github.com/PocketMine/PocketMine-MP.git PocketMine
+  - mkdir PocketMine/plugins
   - wget -O ConsoleScript.php https://github.com/PocketMine/DevTools/blob/master/src/DevTools/ConsoleScript.php
-  - php ConsoleScript.php -dphar.readonly=0 --make ../$TRAVIS_BUILD_DIR --out plugins/StatsCore.phar
-  - wget -O server.properties https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/ae7e581ee8a22636b160dafe99cb8e02f3e210b0/statscore-server.properties
-  - wget -O pocketmine.yml https://raw.githubusercontent.com/PocketMine/PocketMine-MP/master/src/pocketmine/resources/pocketmine.yml
+  - php ConsoleScript.php -dphar.readonly=0 --make StatsCore --out PocketMine/plugins/StatsCore.phar
+  - php ConsoleScript.php -dphar.readonly=0 --make AutoKiller --out PocketMine/plugins/AutoKiller.phar
+  - wget -O PocketMine/server.properties https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/ae7e581ee8a22636b160dafe99cb8e02f3e210b0/statscore-server.properties
+  - wget -O PocketMine/pocketmine.yml https://raw.githubusercontent.com/PocketMine/PocketMine-MP/master/src/pocketmine/resources/pocketmine.yml
 
 script:
-  - php src/PocketMine.php
+  - php PocketMine/src/PocketMine.php
 
 after_script:
-  - dir
+  - dir /s/p/w
