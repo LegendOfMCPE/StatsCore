@@ -199,14 +199,14 @@ class MysqliLog extends Log{
 		$this->db->query("UPDATE players SET $column = $value WHERE name = {$this->esc($player->getName())};");
 	}
 	public function getDeaths($name){
-		$result = $this->db->query("SELECT deaths FROM times WHERE player = {$this->esc($player->getName())};");
+		$result = $this->db->query("SELECT deaths FROM times WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["deaths"];
 		}
 		return false;
 	}
 	public function getKills($name){
-		$result = $this->db->query("SELECT kills FROM times WHERE player = {$this->esc($player->getName())};");
+		$result = $this->db->query("SELECT kills FROM times WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["kills"];
 		}
@@ -245,7 +245,7 @@ class MysqliLog extends Log{
 		// Is this Chat Frequency Count or Average?
 	}
 	public function getOfflineDays($name){
-		$result = $this->db->query("SELECT players FROM offline_days WHERE player = {$this->esc($player->getName())};");
+		$result = $this->db->query("SELECT players FROM offline_days WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["players"];
 		}

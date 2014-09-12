@@ -2,11 +2,14 @@
 
 namespace legendofmcpe\statscore\log;
 
+use legendofmcpe\statscore\StatsCore;
 use pocketmine\Player;
 
 abstract class NestedArrayLog extends Log{
+	/** @var string $dir */
 	protected $dir;
-	public function __construct($dir){
+	public function __construct(StatsCore $main, $dir){
+		parent::__construct($main);
 		$this->dir = $dir;
 	}
 	protected function init(array $args){
