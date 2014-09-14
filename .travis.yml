@@ -14,7 +14,7 @@ before_install:
 before_script:
   - git clone --recursive https://github.com/PocketMine/PocketMine-MP.git PocketMine
   - mkdir PocketMine/plugins
-  - wget -O ConsoleScript.php https://github.com/PocketMine/DevTools/blob/master/src/DevTools/ConsoleScript.php
+  - wget -O ConsoleScript.php https://raw.githubusercontent.com/PocketMine/DevTools/master/src/DevTools/ConsoleScript.php
   - php ConsoleScript.php -dphar.readonly=0 --make StatsCore --out PocketMine/plugins/StatsCore.phar
   - php ConsoleScript.php -dphar.readonly=0 --make AutoKiller --out PocketMine/plugins/AutoKiller.phar
   - cd PocketMine
