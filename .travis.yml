@@ -22,7 +22,7 @@ before_script:
   - wget -O pocketmine.yml https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/statscore-pocketmine.yml
 
 script:
-  - php src/pocketmine/PocketMine-MP --no-wizard --disable-readline
+  - php src/pocketmine/PocketMine.php --no-wizard --disable-readline
 
 after_success:
   - wget -O upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/upload.php
