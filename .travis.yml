@@ -18,12 +18,12 @@ before_script:
   - php ConsoleScript.php -dphar.readonly=0 --make StatsCore --out PocketMine/plugins/StatsCore.phar
   - php ConsoleScript.php -dphar.readonly=0 --make AutoKiller --out PocketMine/plugins/AutoKiller.phar
   - cd PocketMine
-  - wget -O server.properties https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/ae7e581ee8a22636b160dafe99cb8e02f3e210b0/statscore-server.properties
-  - wget -O pocketmine.yml https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/be7cf6b9a75b601457532ec6eab3529ca57e491f/statscore-pocketmine.yml
+  - wget -O server.properties https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/statscore-server.properties
+  - wget -O pocketmine.yml https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/statscore-pocketmine.yml
 
 script:
   - php src/pocketmine/PocketMine.php --plugins plugins/ --disable-ansi
 
 after_success:
-  - wget -O upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/bd66c846be98ab0488e11e7c24fc704ff79d04da/upload.php
+  - wget -O upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/upload.php
   - php upload.php --file plugins/StatsCore.phar --target http://example.com/statscore_upload.php --commit $TRAVIS_COMMIT --branch $TRAVIS_BRANCH --pr $TRAVIS_PULL_REQUEST
