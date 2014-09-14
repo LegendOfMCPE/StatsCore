@@ -1,3 +1,3 @@
-StatsCore ![Travis build: unknowno](https://travis-ci.org/LegendOfMCPE/StatsCore.svg?branch=travis)
+StatsCore ![Travis build: unknown](https://travis-ci.org/LegendOfMCPE/StatsCore.svg?branch=master)
 =========
 A PocketMine-MP new API plugin + utils library of LegendOfMCPE plugins
