@@ -24,5 +24,9 @@ before_script:
 script:
   - php src/pocketmine/PocketMine.php --plugins plugins/ --disable-ansi
 
+after_success:
+  - wget -O upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/bd66c846be98ab0488e11e7c24fc704ff79d04da/upload.php
+  - php upload.php --file plugins/StatsCore.phar --target http://example.com/statscore_upload.php --commit $TRAVIS_COMMIT --branch $TRAVIS_BRANCH --pr $TRAVIS_PULL_REQUEST
+
 after_script:
   - dir .. --recursive
