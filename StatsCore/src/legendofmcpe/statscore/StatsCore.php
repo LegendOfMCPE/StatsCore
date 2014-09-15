@@ -43,7 +43,7 @@ class StatsCore extends PluginBase implements Listener{
 					break;
 				}
 			default:
-				$this->getLogger()->warning("Unknown database type: ".$dbc["type"].". JSON database will be used.";
+				$this->getLogger()->warning("Unknown database type: ".$dbc["type"].". JSON database will be used.");
 			case "json":
 				$this->log = new JSONLog($this, $dbc["json"]["dir"], $dbc["json"]["pretty print"]);
 				break;
