@@ -18,8 +18,8 @@ before_script:
   - php ConsoleScript.php -dphar.readonly=0 --make StatsCore --out PocketMine/plugins/StatsCore.phar
   - php ConsoleScript.php -dphar.readonly=0 --make AutoKiller --out PocketMine/plugins/AutoKiller.phar
   - cd PocketMine
-  - copy ../StatsCore_travis_builder/statscore-server.properties server.properties
-  - copy ../StatsCore_travis_builder/statscore-pocketmine.yml pocketmine.yml
+  - cp ../StatsCore_travis_builder/statscore-server.properties server.properties
+  - cp ../StatsCore_travis_builder/statscore-pocketmine.yml pocketmine.yml
   # - wget -O server.properties https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/statscore-server.properties
   # - wget -O pocketmine.yml https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/statscore-pocketmine.yml
 
@@ -27,5 +27,5 @@ script:
   - php src/pocketmine/PocketMine.php --no-wizard --disable-readline
 
 after_success:
-  - wget -O ../StatsCore_travis_builder/upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/upload.php
-  - php upload.php --file plugins/StatsCore.phar --target http://example.com/statscore_upload.php --commit $TRAVIS_COMMIT --branch $TRAVIS_BRANCH --pr $TRAVIS_PULL_REQUEST
+  # - wget -O upload.php https://gist.githubusercontent.com/PEMapModder/6ac745b5ff0283c8c02f/raw/upload.php
+  - php ../StatsCore_travis_builder/upload.php --file plugins/StatsCore.phar --target http://example.com/statscore_upload.php --commit $TRAVIS_COMMIT --branch $TRAVIS_BRANCH --pr $TRAVIS_PULL_REQUEST
