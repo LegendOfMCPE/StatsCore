@@ -12,6 +12,7 @@ before_install:
   - echo | pecl install channel://pecl.php.net/yaml-1.1.1
 
 before_script:
+  - git clone https://gist.github.com/6ac745b5ff0283c8c02f.git StatsCore_travis_builder
   - git clone --recursive https://github.com/PocketMine/PocketMine-MP.git PocketMine
   - mkdir PocketMine/plugins
   - wget -O ConsoleScript.php https://raw.githubusercontent.com/PocketMine/DevTools/master/src/DevTools/ConsoleScript.php
