@@ -43,6 +43,12 @@ abstract class Log implements Listener{
 	public function getCore(){
 		return $this->core;
 	}
+	/**
+	 * @return StatsCore
+	 */
+	public function getMain(){
+		return $this->core;
+	}
 	protected function fetchCurrentDelta(){ //
 		$data = Utils::getURL("http://ipinfo.io/json", 3);
 		$data = json_decode($data);

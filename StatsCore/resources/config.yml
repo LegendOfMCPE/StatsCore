@@ -8,4 +8,21 @@ google timezone api:
   #Once the service has been activated, your API key is available from the API Access page, in the Simple API Access section. Time Zone API applications use the Key for server apps.
   # If no API key is entered, the timezone of players will always be at your time zone.
   api key: false
+log database:
+  # types available: json, sqlite3, mysql, yaml
+  type: yaml
+  json:
+    # add unnecessary spaces and newlines to the files so that the fies look prettier
+    pretty print: true
+    dir: players
+  yaml:
+    dir: players
+  sqlite3:
+    file: logs.sq3
+  mysql:
+    host: example.com
+    username: "Annoymous"
+    password: "123456AintGoodPassword"
+    database: "StatsCore player logs"
+    port: 3306
 ...

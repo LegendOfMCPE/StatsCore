@@ -2,6 +2,10 @@
 
 namespace legendofmcpe\statscore;
 
+use legendofmcpe\statscore\log\JSONLog;
+use legendofmcpe\statscore\log\YAMLLog;
+use legendofmcpe\statscore\log\SQLite3Log;
+use legendofmcpe\statscore\log\MysqliLog;
 use legendofmcpe\statscore\request\PlayerRequestable;
 use legendofmcpe\statscore\request\Request;
 use legendofmcpe\statscore\request\RequestList;
@@ -25,7 +29,31 @@ class StatsCore extends PluginBase implements Listener{
 	public function onEnable(){
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->getServer()->getPluginManager()->registerEvents($this->offlineInbox = new OfflineMessageList($this), $this);
-		$this->log = null; // TODO which type
+		$config = $this->getConfig();
+		$dbc = $config->get("log database");
+		switch($dbc["type"]){
+			case "mysql":
+				$conn = $dbc["mysql"];
+				$db = new \mysqli($conn["host"], $conn["username"], $conn["password"], $conn["database"], $conn["port"]);
+				if($db->connect_error){
+					$this->getLogger()->warning("Error connecting to MySQL database: {$db->connect_error}! JSON database will be used instead.");
+				}
+				else{
+					$this->log = new MysqliLog($this, $db);
+					break;
+				}
+			default:
+				$this->getLogger()->warning("Unknown database type: ".$dbc["type"].". JSON database will be used.";
+			case "json":
+				$this->log = new JSONLog($this, $dbc["json"]["dir"], $dbc["json"]["pretty print"]);
+				break;
+			case "yaml":
+				$this->log = new YAMLLog($this, $dbc["yaml"]["dir"]);
+				break;
+			case "sqlite3":
+				$this->log = new SQLite3Log($this, $dbc["sqlite3"]["file"]);
+				break;
+		}
 		$this->getServer()->getPluginManager()->registerEvents($this->log, $this);
 		$this->reqList = new RequestList($this);
 		$cmd = new CustomPluginCommand("request", $this, array($this, "onReqCmd"));

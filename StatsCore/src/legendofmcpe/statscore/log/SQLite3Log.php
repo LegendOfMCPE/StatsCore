@@ -2,9 +2,16 @@
 
 namespace legendofmcpe\statscore\log;
 
+use legendofmcpe\statscore\StatsCore;
 use pocketmine\Player;
 
 class SQLite3Log extends Log{
+	/** @var string */
+	private $file;
+	public function __construct(StatsCore $main, $file){
+		parent::__construct($main);
+		$this->file = $file;
+	}
 	protected function init(array $args){
 		// TODO: Implement init() method.
 	}

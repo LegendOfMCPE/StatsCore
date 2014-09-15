@@ -60,6 +60,9 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 		return $this->plugin;
 	}
 	public function execute(CommandSender $issuer, $lbl, array $args){
+		if(!$this->testPermission($issuer)){
+			return true;
+		}
 		if($this->isInGameOnly()){
 			$data = self::IN_GAME;
 		}

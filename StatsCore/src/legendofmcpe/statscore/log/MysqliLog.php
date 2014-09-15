@@ -9,6 +9,10 @@ class MysqliLog extends Log{
 	private $db;
 	/** @var string */
 	private $table;
+	public function __construct(StatsCore $main, \mysqli $db){
+		parent::__construct($main);
+		$this->db = $db;
+	}
 	protected function init(array $args){
 		$this->table = $args["table"];
 		$this->db = $args[0];

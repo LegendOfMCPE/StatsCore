@@ -10,6 +10,9 @@ abstract class NestedArrayLog extends Log{
 	protected $dir;
 	public function __construct(StatsCore $main, $dir){
 		parent::__construct($main);
+		if(!is_dir($dir)){
+			mkdir($dir, 0777, true);
+		}
 		$this->dir = $dir;
 	}
 	protected function init(array $args){
