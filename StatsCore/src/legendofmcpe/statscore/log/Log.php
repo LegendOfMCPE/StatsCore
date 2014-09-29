@@ -243,7 +243,6 @@ abstract class Log implements Listener{
 	}
 	public abstract function getMbChatTotalLen($name);
 	public abstract function getMbChatCnt($name);
-	public abstract function getChatFreq($name);
 	public abstract function getCoords($ip);
 	public abstract function getTimezoneDelta($coords);
 	public abstract function getCurrentTimezoneDeltaFromUTC();

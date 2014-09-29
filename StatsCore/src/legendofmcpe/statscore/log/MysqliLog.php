@@ -2,6 +2,7 @@
 
 namespace legendofmcpe\statscore\log;
 
+use legendofmcpe\statscore\StatsCore;
 use pocketmine\Player;
 
 class MysqliLog extends Log{
@@ -243,10 +244,6 @@ class MysqliLog extends Log{
 			return $array["players"];
 		}
 		return false;
-	}
-	public function getChatFreq($name){
-		// TODO: Implement getChatFreq() method.
-		// Is this Chat Frequency Count or Average?
 	}
 	public function getOfflineDays($name){
 		$result = $this->db->query("SELECT players FROM offline_days WHERE player = {$this->esc($name)};");

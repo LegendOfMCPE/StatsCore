@@ -111,9 +111,6 @@ class SQLite3Log extends Log{
 	public function getMbChatCnt($name){
 		// TODO: Implement getMbChatCnt() method.
 	}
-	public function getChatFreq($name){
-		// TODO: Implement getChatFreq() method.
-	}
 	public function getOfflineDays($name){
 		// TODO: Implement getOfflineDays() method.
 	}
