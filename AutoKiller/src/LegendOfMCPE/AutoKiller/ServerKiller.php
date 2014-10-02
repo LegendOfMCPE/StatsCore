@@ -7,7 +7,7 @@ use pocketmine\scheduler\PluginTask;
 
 class ServerKiller extends PluginTask{
 	public function onRun($ticks){
-		$this->getOwner()->getLogger()->alert("Trying to stop the server...");
-		$this->getOwner()->getServer()->dispatchCommand(new ConsoleCommandSender(), "stop");
+		$this->getOwner()->getLogger()->alert("Checking status...");
+		if(count($this->getOwnee()->getServer()->getPluginManager()->getPlugins()) >= 2) exit(0); else exit(2);
 	}
 }
