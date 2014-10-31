@@ -32,6 +32,7 @@ class StatsCore extends PluginBase implements Listener{
 		$config = $this->getConfig();
 		$dbc = $config->get("log database");
 		switch($dbc["type"]){
+			/** @noinspection PhpMissingBreakStatementInspection */
 			case "mysql":
 				$conn = $dbc["mysql"];
 				$db = new \mysqli($conn["host"], $conn["username"], $conn["password"], $conn["database"], $conn["port"]);
@@ -161,5 +162,11 @@ class StatsCore extends PluginBase implements Listener{
 	 */
 	public function getLog(){
 		return $this->log;
+	}
+	/**
+	 * @return OfflineMessageList
+	 */
+	public function getOfflineInbox(){
+		return $this->offlineInbox;
 	}
 }
