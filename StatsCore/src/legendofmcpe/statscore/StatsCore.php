@@ -25,6 +25,7 @@ class StatsCore extends PluginBase implements Listener{
 	private $log;
 	public function onLoad(){
 		self::$name = $this->getName();
+		class_exists("legendofmcpe\\statscore\\utils\\Table");
 	}
 	public function onEnable(){
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
