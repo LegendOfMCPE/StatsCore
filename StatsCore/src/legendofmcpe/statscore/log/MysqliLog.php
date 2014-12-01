@@ -218,28 +218,28 @@ class MysqliLog extends Log{
 		return false;
 	}
 	public function getChatMsgTotalLen($name){
-		$result = $this->db->query("SELECT players FROM chat_msg_total_len;");
+		$result = $this->db->query("SELECT players FROM chat_msg_total_len WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["players"];
 		}
 		return false;
 	}
 	public function getChatMsgCnt($name){
-		$result = $this->db->query("SELECT players FROM chat_msg_cnt;");
+		$result = $this->db->query("SELECT players FROM chat_msg_cnt WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["players"];
 		}
 		return false;
 	}
 	public function getMbChatTotalLen($name){
-		$result = $this->db->query("SELECT players FROM chat_msg_mb_len;");
+		$result = $this->db->query("SELECT players FROM chat_msg_mb_len WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["players"];
 		}
 		return false;
 	}
 	public function getMbChatCnt($name){
-		$result = $this->db->query("SELECT players FROM chat_msg_mb_cnt;");
+		$result = $this->db->query("SELECT players FROM chat_msg_mb_cnt WHERE player = {$this->esc($name)};");
 		if(is_array($array = $result->fetch_assoc())){
 			return $array["players"];
 		}
