@@ -1,11 +1,9 @@
 <?php
 
 namespace legendofmcpe\statscore;
-
-use legendofmcpe\statscore\log\JSONLog;
-use legendofmcpe\statscore\log\YAMLLog;
-use legendofmcpe\statscore\log\SQLite3Log;
-use legendofmcpe\statscore\log\MysqliLog;
+;
+use legendofmcpe\statscore\log\JsonLog;
+use legendofmcpe\statscore\log\YamlLog;
 use legendofmcpe\statscore\request\PlayerRequestable;
 use legendofmcpe\statscore\request\Request;
 use legendofmcpe\statscore\request\RequestList;
@@ -23,6 +21,8 @@ class StatsCore extends PluginBase implements Listener{
 	private $offlineInbox;
 	/** @var log\Log */
 	private $log;
+	/** @var \mysqli|null */
+	private $globalMysqli = null;
 	public function onLoad(){
 		self::$name = $this->getName();
 		class_exists("legendofmcpe\\statscore\\utils\\Table");
@@ -32,28 +32,22 @@ class StatsCore extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this->offlineInbox = new OfflineMessageList($this), $this);
 		$config = $this->getConfig();
 		$dbc = $config->get("log database");
+		if(!isset($dbc[$type = strtolower($dbc["type"])])){
+			throw new \RuntimeException("StatsCore config.yml error: unknown log type: $type");
+		}
+		$args = $dbc["type"];
 		switch($dbc["type"]){
-			/** @noinspection PhpMissingBreakStatementInspection */
-			case "mysql":
-				$conn = $dbc["mysql"];
-				$db = new \mysqli($conn["host"], $conn["username"], $conn["password"], $conn["database"], $conn["port"]);
-				if($db->connect_error){
-					$this->getLogger()->warning("Error connecting to MySQL database: {$db->connect_error}! JSON database will be used instead.");
-				}
-				else{
-					$this->log = new MysqliLog($this, $db);
-					break;
-				}
-			default:
-				$this->getLogger()->warning("Unknown database type: ".$dbc["type"].". JSON database will be used.");
-			case "json":
-				$this->log = new JSONLog($this, $dbc["json"]["dir"], $dbc["json"]["pretty print"]);
-				break;
 			case "yaml":
-				$this->log = new YAMLLog($this, $dbc["yaml"]["dir"]);
+				$this->log = new YamlLog($this, $args);
+				break;
+			case "json":
+				$this->log = new JsonLog($this, $args);
 				break;
 			case "sqlite3":
-				$this->log = new SQLite3Log($this, $dbc["sqlite3"]["file"]);
+				// TODO
+				break;
+			case "mysql":
+				// TODO
 				break;
 		}
 		$this->getServer()->getPluginManager()->registerEvents($this->log, $this);
@@ -67,6 +61,7 @@ class StatsCore extends PluginBase implements Listener{
 	}
 	public function onDisable(){
 		$this->reqList->finalize();
+		$this->log->close();
 	}
 	public function getRequestList(){
 		return $this->reqList;
@@ -153,10 +148,14 @@ class StatsCore extends PluginBase implements Listener{
 		}
 	}
 	/**
+	 * @param Server|null $server
 	 * @return static|null
 	 */
-	public static function getInstance(){
-		return Server::getInstance()->getPluginManager()->getPlugin(self::$name);
+	public static function getInstance(Server $server = null){
+		if(!($server instanceof Server)){
+			$server = Server::getInstance();
+		}
+		return $server->getPluginManager()->getPlugin(self::$name);
 	}
 	/**
 	 * @return \legendofmcpe\statscore\log\Log
@@ -169,5 +168,35 @@ class StatsCore extends PluginBase implements Listener{
 	 */
 	public function getOfflineInbox(){
 		return $this->offlineInbox;
+	}
+	public function parsePath($path){
+		$pos = strpos($path, "://");
+		if($pos === false){
+			return realpath($this->getDataFolder() . $path);
+		}
+		switch(strtolower(substr($pos, 0, $pos))){
+			case "file":
+				return realpath(substr($path, 0, $pos + 3));
+			case "res":
+				return realpath($this->getFile() . "/resources/" . substr($path, 0, $pos + 3));
+			default:
+				return $path;
+		}
+	}
+	/**
+	 * @param StatsCore $instance
+	 * @return \mysqli
+	 * @throws \RuntimeException
+	 */
+	public static function requestGlobalMysqli(static $instance){
+		if(isset($instance->globalMysqli)){
+			return $instance->globalMysqli;
+		}
+		$con = $instance->getConfig()->get("global mysql database");
+		$instance->globalMysqli = new \mysqli($con["host"], $con["username"], $con["password"], $con["database"], $con["port"]);
+		if($instance->globalMysqli->connect_error){
+			throw new \RuntimeException("Cannot create MySQL connection: {$instance->globalMysqli->connect_error}");
+		}
+		return $instance->globalMysqli->connect_error;
 	}
 }

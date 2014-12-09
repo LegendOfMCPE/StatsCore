@@ -24,7 +24,7 @@ abstract class Log implements Listener{
 	private $plugin;
 	/** @var LogSession[] */
 	protected $sessions = [];
-	public function __construct(StatsCore $plugin){
+	protected function __construct(StatsCore $plugin){
 		$this->plugin = $plugin;
 		if(!function_exists("mb_strlen")){
 			$plugin->getLogger()->warning("Multibyte String extension not found on this server (function mb_strlen() does not exist). The multibyte-character-statistics feature will be disabled");

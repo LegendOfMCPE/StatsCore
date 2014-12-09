@@ -6,7 +6,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
-use pocketmine\Server;
 
 class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 	const NO_PERM = 0;
@@ -17,6 +16,7 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 	const ANY = 0;
 	const CONSOLE_ONLY = 1;
 	const IN_GAME_ONLY = 2;
+	private $plugin;
 	private $state = self::ANY;
 	private $arg0Obj = false;
 	public function __construct($name, Plugin $plugin, callable $exe){
@@ -45,7 +45,7 @@ class CustomPluginCommand extends Command implements PluginIdentifiableCommand{
 		elseif(!is_string($prefix)){
 			$prefix = strtolower($this->getPlugin()->getDescription()->getPrefix());
 		}
-		Server::getInstance()->getCommandMap()->register($prefix, $this);
+		$this->plugin->getServer()->getCommandMap()->register($prefix, $this);
 	}
 	public function setState($state){
 		$this->state = $state;
