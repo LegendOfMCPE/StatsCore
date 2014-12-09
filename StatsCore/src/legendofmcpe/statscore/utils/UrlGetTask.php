@@ -13,15 +13,17 @@ class UrlGetTask extends AsyncTask{
 	private $callback;
 	/** @var int */
 	private $timeout;
-	public function __construct($url, callable $callback, $timeout = 10){
+	private $args;
+	public function __construct($url, callable $callback, $timeout, ...$args){
 		$this->url = $url;
 		$this->callback = $callback;
 		$this->timeout = $timeout;
+		$this->args = $args;
 	}
 	public function onRun(){
 		$this->setResult(Utils::getURL($this->url, $this->timeout));
 	}
 	public function onCompletion(Server $server){
-		call_user_func($this->callback, $this->getResult());
+		call_user_func($this->callback, $this->getResult(), ...$this->args);
 	}
 }
